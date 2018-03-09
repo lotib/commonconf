@@ -4,5 +4,11 @@ external_ip=$(curl -s checkip.dyndns.org | sed -e 's/.*Current IP Address: //' -
 
 echo ${external_ip}
 
-nslookup ${external_ip}
+if [ "$1" == "all" ] ;
+then
+	nslookup ${external_ip}
+	whois ${external_ip}
+fi
+
+
 
