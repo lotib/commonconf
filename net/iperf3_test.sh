@@ -7,6 +7,7 @@
 
 for i in {0..10}; do
     iperf3 -c bouygues.iperf.fr && break
+    sleep 1
 done
 
 
