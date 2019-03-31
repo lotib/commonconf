@@ -10,9 +10,9 @@ grep intel_iommu /boot/grub/grub.cfg
 
 # check vhost_vsock kernel module 
 [ ! -f /dev/vhost-vsock ] && modprobe vhost_vsock
+[ -f /dev/vhost-vsock ] && chmod 0666 /dev/vhost-vsock 
 # check devices
 ls -l /dev/vhost*
-
 
 # add "/dev/vhost-vsock" to the cgroup_device_acl into /etc/libvirt/qemu.conf and restart libvirtd
 systemctl restart libvirtd.service
