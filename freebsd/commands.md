@@ -76,4 +76,71 @@ bhyvectl --destroy --vm=guestname
 
 ```
 
+## vm-bhyve
 
+```shell
+
+# pfSense installation example
+# https://shaner.life/bhyve-pfsense-2-4-no-console-menu/
+
+pkg install -y vm-bhyve grub2-bhyve
+zfs create -o mountpoint=/bhyve zroot/bhyve
+sysrc vm_enable="YES"
+sysrc vm_dir="zfs:zroot/bhyve"
+vm init
+
+vm switch import wan bridge0
+vm switch import mgmt bridge1
+fetch -o /tmp/pf-memstick-serial.img.gz 
+https://nyifiles.pfsense.org/mirror/downloads/pfSense-CE-memstick-serial-2.4.2-RELEASE-amd64.img.gz
+gunzip /tmp/pf-memstick-serial.img.gz
+
+
+# pfsense vm
+
+cd /bhyve/.templates
+cat > pfsense.conf <<EOF
+loader="bhyveload"
+cpu=2
+memory=512M
+network0_type="virtio-net"
+network0_switch="wan"
+network1_type="virtio-net"
+network1_switch="mgmt"
+disk0_type="virtio-blk"
+disk0_name="disk0.img"
+EOF
+vm create -t pfsense -s10G pfsense1
+
+# add installer
+cd /bhyve/pfsense1/
+mkdir tmp
+cp /tmp/installer.img tmp/
+cp pfsense1.conf pfsense1.orig.conf
+cat >pfsense1.conf<<EOF
+loader="bhyveload"
+cpu=2
+memory=512M
+network0_type="virtio-net"
+network0_switch="wan"
+network1_type="virtio-net"
+network1_switch="mgmt"
+disk0_type="virtio-blk"
+disk0_name="/tmp/installer.img"
+disk1_type="virtio-blk"
+disk1_name="disk0.img"
+EOF
+vm start pfsense1
+vm console pfsense1
+
+
+# revert installer disk configuration and restart
+vm stop pfsense1
+mv /bhyve/pfsense1/pfsense1.orig.conf /bhyve/pfsense1/psensef1.conf
+vm start pfsense1
+
+
+
+
+
+```
