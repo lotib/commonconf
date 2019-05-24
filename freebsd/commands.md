@@ -84,13 +84,13 @@ bhyvectl --destroy --vm=guestname
 # https://shaner.life/bhyve-pfsense-2-4-no-console-menu/
 
 pkg install -y vm-bhyve grub2-bhyve
-zfs create -o mountpoint=/bhyve zroot/bhyve
+zfs create -o mountpoint=/mnt/bhyve zroot/bhyve
 sysrc vm_enable="YES"
 sysrc vm_dir="zfs:zroot/bhyve"
 vm init
 
-vm switch import wan bridge0
-vm switch import mgmt bridge1
+vm switch import wan bridge1
+vm switch import lan bridge0
 fetch -o /tmp/pf-memstick-serial.img.gz 
 https://nyifiles.pfsense.org/mirror/downloads/pfSense-CE-memstick-serial-2.4.2-RELEASE-amd64.img.gz
 gunzip /tmp/pf-memstick-serial.img.gz
@@ -140,7 +140,27 @@ mv /bhyve/pfsense1/pfsense1.orig.conf /bhyve/pfsense1/psensef1.conf
 vm start pfsense1
 
 
+# on freenas don't forget to write your rc.conf
+mount -uw /
+cp /etc/rc.conf /conf/base/etc/rc.conf
 
-
+# or append it to your rc.conf
+vm_enable="YES"
+vm_dir="zfs:data_disk/bhyve"
+vm_list="pfsense1"
+vm_delay="5"
 
 ```
+
+
+# freenas
+
+to modify rc.conf ...
+
+```shell
+mount -uw / 
+#edit /conf/base/etc/rc.conf or /conf/base/*
+mount -ur / 
+```
+
+Or do the freenas way using tunable in gui.
