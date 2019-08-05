@@ -11,6 +11,7 @@ grep intel_iommu /boot/grub/grub.cfg
 # check vhost_vsock kernel module 
 [ ! -f /dev/vhost-vsock ] && modprobe vhost_vsock
 [ -f /dev/vhost-vsock ] && chmod 0666 /dev/vhost-vsock 
+[ -f /dev/vsock ] && chmod a+r /dev/vsock 
 # check devices
 ls -l /dev/vhost*
 
@@ -29,6 +30,17 @@ Add the **custom qemu** args to the vm domain
     <qemu:arg value='-device'/>
     <qemu:arg value='vhost-vsock-pci,id=vhost-vsock-pci0,guest-cid=3'/>
   </qemu:commandline>
+
+```
+
+It seems libvirt can handle the vsock declaration 
+
+```xml
+<vsock model='virtio'>
+<cid auto='no' address='3'/>
+<alias name='ua-04c3388d-4e33-4023-84de-a2205c777asdfdsf'/>
+<address type='pci' domain='0x0000' bus='0x00' slot='0x0b' function='0x0'/>
+</vsock>
 
 ```
 
@@ -53,5 +65,7 @@ ssh -p 2222 user@127.0.0.1
 https://github.com/stefanha/nc-vsock
 https://github.com/lotib/nc-vsock
 https://github.com/clownix/cloonix_vsock
+https://bugzilla.redhat.com/show_bug.cgi?id=1291851
+https://medium.com/@mdlayher/linux-vm-sockets-in-go-ea11768e9e67
 
 
