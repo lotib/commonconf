@@ -23,6 +23,12 @@ ifconfig bridge0 up
 
 ```shell
 zfs create -V16G -o volmode=dev zroot/zfsdisk0
+
+zfs list -t snapshot
+
+# copy and leave
+nohup sh -c "zfs send pool/dataset@snapshot | zfs receive -F pool/dataset"
+
 ```
 
 
